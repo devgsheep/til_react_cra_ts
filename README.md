@@ -1,362 +1,183 @@
-# Component TS 버전
+# useState
 
-## 0. 환경세팅 문제 해결
+- 리액트용 변수이다. (수업편의)
+- set으로 값을 변화시키면 리랜더링을 한다.
 
-- 프로젝트 생성하면 최신 버전을 받으므로 원활하지 않다.
-- `npm install @types/react@18 @types/react-dom@18 --save-dev`
-- `tsconfig.json 추가`
+## 1. 기본예제
 
-```json
-  "compilerOptions": {
-    ...
-    "types": ["react"] // 추가
+- /src/components 폴더 생성
+- Counter.tsx 파일 생성
+
+```tsx
+import { useState } from 'react';
+
+// 2번이상 반복되고, 가독성이 떨어집니다.
+// 1. type으로 정의해 보자.
+type VoidFunction = () => void;
+type JSXElement = () => JSX.Element;
+
+// 2. interface로 정의해보자
+interface IVoidFunction {
+  (): void;
+}
+interface IJSXElement {
+  (): JSX.Element;
+}
+
+const Counter: IJSXElement | JSXElement = (): JSX.Element => {
+  // ts 자리
+  const [count, setCount] = useState<number>(0);
+
+  const handleAdd: IVoidFunction | VoidFunction = (): void => {
+    setCount(count + 1);
+  };
+  const handleMinus: IVoidFunction | VoidFunction = (): void => {
+    setCount(count - 1);
+  };
+  const handleReset: IVoidFunction | VoidFunction = (): void => {
+    setCount(0);
+  };
+  // tsx 자리
+  return (
+    <div>
+      <h2>Counte : {count} </h2>
+      <button onClick={handleAdd}>증가</button>
+      <button onClick={handleMinus}>감소</button>
+      <button onClick={handleReset}>초기화</button>
+    </div>
+  );
+};
+
+export default Counter;
+```
+
+## 2. 실습 예제 1
+
+- /src/components/NameEditor.tsx
+
+```tsx
+import { ChangeEvent, useState, MouseEvent } from 'react';
+
+// 1. type 으로 함수 리턴형을 생성해보자.
+type JSXElement = () => JSX.Element;
+type ChangeEventInput = (e: ChangeEvent<HTMLInputElement>) => void;
+type ClickEventButton = (e: MouseEvent<HTMLButtonElement>) => void;
+type NameType = string;
+
+// 2. interface로 정의하기
+interface IJSXElement {
+  (): JSX.Element;
+}
+interface IChangeEventInput {
+  (e: ChangeEvent<HTMLInputElement>): void;
+}
+interface IClickEventButton {
+  (e: MouseEvent<HTMLButtonElement>): void;
+}
+
+const NameEditor: JSXElement | IJSXElement = () => {
+  // ts자리
+  const [name, setName] = useState<NameType>('');
+  const handleName: ChangeEventInput | IChangeEventInput = (e): void => {
+    setName(e.target.value);
+  };
+  const handleClick: ClickEventButton | IClickEventButton = (e): void => {
+    console.log('클릭');
+    setName('');
+  };
+  // tsx자리
+  return (
+    <div>
+      <h2>NameEditor : {name}</h2>
+      <div>
+        <input type="text" value={name} onChange={e => handleName(e)} />
+        <button onClick={e => handleClick(e)}>확인</button>
+      </div>
+    </div>
+  );
+};
+
+export default NameEditor;
+```
+
+## 3. 실습 예제 2
+
+- /src/components/ToggleSwitch.tsx
+
+```tsx
+import { useState } from 'react';
+
+// 1. Type
+type ToggleSwitchType = () => JSX.Element;
+type HandleClickType = () => void;
+type ToggleType = boolean;
+
+// 2. interface
+interface IToggleSwitch {
+  (): JSX.Element;
+}
+interface IHandleClickType {
+  (): void;
+}
+
+const ToggleSwitch: ToggleSwitchType | IToggleSwitch = () => {
+  // ts 자리
+  const [isOn, setIsOn] = useState<ToggleType>(false);
+  const handleClick: HandleClickType | IHandleClickType = () => {
+    setIsOn(!isOn);
+  };
+  // tsx 자리
+  return (
+    <div>
+      <h2>ToggleSwitch : {isOn ? '밝아요' : '어두워요'}</h2>
+      <div>
+        <button onClick={handleClick}>토글</button>
+      </div>
+    </div>
+  );
+};
+
+export default ToggleSwitch;
+```
+
+## 4. 실습 예제 3
+
+- /src/components/User.tsx
+
+```tsx
+import { useState } from 'react';
+
+// 1. type 정의
+type UserType = { age: number; name: string };
+type ClickType = () => void;
+
+const User = (): JSX.Element => {
+  // 2. interface 정의
+  interface IUser {
+    age: number;
+    name: string;
   }
-```
+  interface IClick {
+    (): void;
+  }
 
-- tsconfig.json 수업 샘플환경
-
-```json
-{
-  "compilerOptions": {
-    "target": "es5",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "noFallthroughCasesInSwitch": true,
-    "module": "esnext",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "jsx": "react-jsx",
-    "types": ["react"]
-  },
-  "include": ["src"]
-}
-```
-
-- 왜 React.FC 에 children이 기본으로 제공되지 않는가?
-- React 버전의 문제라서 발생함. 아래는 18, 19 버전에서 오류
-
-```tsx
-// children이 오류가 난다.
-const Sample: React.FC = ({ children }) => {
+  // ts 자리
+  const [user, setUser] = useState<UserType | IUser>({ name: '아이유', age: 20 });
+  const handleClick: ClickType | IClick = () => {
+    setUser({ ...user, age: user.age + 1 });
+  };
+  // tsx 자리
   return (
     <div>
-      <h2>Sample</h2>
-      <div>{children}</div>
-    </div>
-  );
-};
-```
-
-## 1. 파일 확장자에 대해서 정리
-
-- 파일명.js : 변수, 함수 등을 작성함
-- 파일명.jsx : 컴포넌트를 즉, HTML을 리턴함. (js로 해도 됨)
-- 파일명.ts : 변수, 함수 등을 작성함.
-- 파일명.tsx : 컴포넌트를 즉, HTML을 리턴함.
-- `타입스크립트 프로젝트에 js를 사용해도 됩니다.`
-
-## 2. 파일정리
-
-- 불필요한 파일 정리
-
-## 3. index.tsx 살펴보기
-
-```tsx
-import ReactDOM from 'react-dom/client';
-import App from './App';
-import './index.css';
-
-// as 문법은 개발자가 HTMLElement라고 확신한다는 것을 VSCode에 알려줌.
-// as 문법은 개발자가 null이 아니라고 VSCode에 알려줌.
-const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
-root.render(<App />);
-```
-
-## 4. 컴포넌트 형식 2가지
-
-### 4.1. 함수정의 형식
-
-- `rfce` 탭 : React Function Component Export
-
-```tsx
-function App() {
-  return <div>App</div>;
-}
-
-export default App;
-```
-
-### 4.2. 표현식 정의 형식
-
-- `rafce` 탭 : React Arrow Function Component Expression
-
-```tsx
-const App = () => {
-  return <div>App</div>;
-};
-
-export default App;
-```
-
-## 5. 컴포넌트의 리턴타입에 대한 이해(꼭 이해)
-
-### 5.1. 리턴 타입이 `React.FC` 형태
-
-- React.FC : React Function Component
-- 알아서 `children props`을 자동으로 포함한다.
-
-```tsx
-import React from 'react';
-
-const Sample: React.FC<React.PropsWithChildren> = ({ children }) => {
-  return (
-    <div>
-      <h2>Sample</h2>
-      <div>{children}</div>
+      <h2>
+        User : {user.name}님 나이는 {user.age} 입니다.
+      </h2>
+      <div>
+        <button onClick={handleClick}>나이 증가</button>
+      </div>
     </div>
   );
 };
 
-const App: React.FC = () => {
-  return (
-    <div>
-      <h1>App</h1>
-      <Sample>
-        <p>나는 Children 입니다.</p>
-      </Sample>
-    </div>
-  );
-};
-
-export default App;
-```
-
-- 알아서 `props type`을 자동으로 포함한다.
-- `children`만 있는 경우
-
-```tsx
-import React from 'react';
-
-type SampleProps = {
-  children?: React.ReactNode;
-};
-
-const Sample: React.FC<SampleProps> = ({ children }) => {
-  return (
-    <div>
-      <h2>Sample</h2>
-      <div>{children}</div>
-    </div>
-  );
-};
-
-const App: React.FC = () => {
-  return (
-    <div>
-      <h1>App</h1>
-      <Sample>
-        <p>나는 Children 입니다.</p>
-      </Sample>
-    </div>
-  );
-};
-
-export default App;
-```
-
-- `추가 Props가 있다면`
-
-```tsx
-import React from 'react';
-
-type SampleProps = {
-  children?: React.ReactNode;
-  title: string;
-};
-
-const Sample: React.FC<SampleProps> = ({ children, title }) => {
-  return (
-    <div>
-      <h2>Sample</h2>
-      <div>{title}</div>
-      <div>{children}</div>
-    </div>
-  );
-};
-
-const App: React.FC = () => {
-  return (
-    <div>
-      <h1>App</h1>
-      <Sample title="이것은 Props 중 title 입니다.">
-        <p>나는 Children 입니다.</p>
-      </Sample>
-    </div>
-  );
-};
-
-export default App;
-```
-
-### 5.2. 리턴 타입이 `JSX.Element` 형태 <사용>
-
-- 기본코드
-
-```tsx
-import React from 'react';
-
-const Sample: React.FC = () => {
-  return (
-    <div>
-      <h2>Sample</h2>
-    </div>
-  );
-};
-
-const App: React.FC = () => {
-  return (
-    <div>
-      <h1>App</h1>
-      <Sample></Sample>
-    </div>
-  );
-};
-
-export default App;
-```
-
-- 현장에서 추천하는 형식
-- JSX.Element를 리턴한다고 `직접 명시`함.
-
-```tsx
-import React, { JSX } from 'react';
-
-const Sample: React.FC = (): JSX.Element => {
-  return (
-    <div>
-      <h2>Sample</h2>
-    </div>
-  );
-};
-
-const App: React.FC = (): JSX.Element => {
-  return (
-    <div>
-      <h1>App</h1>
-      <Sample></Sample>
-    </div>
-  );
-};
-
-export default App;
-```
-
-- React.FC 타입은 `일반적으로 생략`한다.
-
-```tsx
-import React, { JSX } from 'react';
-
-const Sample = (): JSX.Element => {
-  return (
-    <div>
-      <h2>Sample</h2>
-    </div>
-  );
-};
-
-const App = (): JSX.Element => {
-  return (
-    <div>
-      <h1>App</h1>
-      <Sample></Sample>
-    </div>
-  );
-};
-
-export default App;
-```
-
-- 그러나, children에 대한 타입은 개발자가 직접 명시해야 한다.
-
-```tsx
-type SampleProps = {
-  children?: React.ReactNode;
-};
-
-const Sample = ({ children }: SampleProps): JSX.Element => {
-  return (
-    <div>
-      <h2>Sample</h2>
-      <div>{children}</div>
-    </div>
-  );
-};
-
-const App = (): JSX.Element => {
-  return (
-    <div>
-      <h1>App</h1>
-      <Sample></Sample>
-    </div>
-  );
-};
-
-export default App;
-```
-
-- Props 전달하는 경우도 역시 Props type을 정의해서 전달해야 한다.
-
-```tsx
-import { JSX } from 'react';
-
-type SampleProps = {
-  children?: React.ReactNode;
-  title: string;
-};
-
-const Sample = ({ children, title }: SampleProps): JSX.Element => {
-  return (
-    <div>
-      <h2>Sample</h2>
-      <div>{title}</div>
-      <div>{children}</div>
-    </div>
-  );
-};
-
-const App = (): JSX.Element => {
-  return (
-    <div>
-      <h1>App</h1>
-      <Sample title="Props 전달된 title 입니다.">
-        <p>Children 입니다.</p>
-      </Sample>
-    </div>
-  );
-};
-
-export default App;
-```
-
-- 오로지 props들만 전달하는 경우
-
-```tsx
-type DemoProps = {
-  name: string;
-  age: string;
-};
-const Demo = ({ name, age }: DemoProps): JSX.Element => {
-  return (
-    <div>
-      {name}이고요, {age}살 입니다.
-    </div>
-  );
-};
+export default User;
 ```
