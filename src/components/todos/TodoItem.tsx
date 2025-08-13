@@ -1,21 +1,18 @@
+import { useTodosActions } from '../../context/todo/hooks';
 import { todoType } from '@/types/todoType';
 import { KeyboardEvent, useState } from 'react';
 
 type TodoItemProps = {
   todo: todoType;
-  onToggle: (id: string) => void;
-  onDelete: (id: string) => void;
-  onEdit: (id: string, newTitle: string) => void;
 };
 
-const TodoItem = ({ todo, onToggle, onDelete, onEdit }: TodoItemProps) => {
+const TodoItem = ({ todo }: TodoItemProps) => {
   // js 자리
+  const { toggleTodo, deleteTodo, editTodo } = useTodosActions();
   // 현재 Edit 상태인지 아닌지 관리
   const [isEdit, setIsEdit] = useState<boolean>(false);
   // Edit 상태라면 입력중인 title 내용 관리
   const [editTitle, setEditTitle] = useState<string>(todo.title);
-
-  // jsx 자리
 
   // 수정은 별도의 입력창 구성으로 수정 후 값만 업데이트
   const handleEdit = () => {
@@ -38,7 +35,7 @@ const TodoItem = ({ todo, onToggle, onDelete, onEdit }: TodoItemProps) => {
     // 1. 업데이트 해줌
     if (editTitle.trim()) {
       // 변경되어야 할 ID, 새로운 타이틀 전달
-      onEdit(todo.id, editTitle);
+      editTodo(todo.id, editTitle);
       // 2. 상태는 isEdit을 false로 변경
       setIsEdit(false);
     }
@@ -62,6 +59,7 @@ const TodoItem = ({ todo, onToggle, onDelete, onEdit }: TodoItemProps) => {
     gap: '10px',
   };
 
+  // jsx 자리
   return (
     <li style={liStyle}>
       {isEdit ? (
@@ -77,10 +75,10 @@ const TodoItem = ({ todo, onToggle, onDelete, onEdit }: TodoItemProps) => {
         </>
       ) : (
         <>
-          <input type="checkbox" onChange={() => onToggle(todo.id)} checked={todo.completed} />
+          <input type="checkbox" onChange={() => toggleTodo(todo.id)} checked={todo.completed} />
           <span>{todo.title}</span>
           <button onClick={handleEdit}>수정</button>
-          <button onClick={() => onDelete(todo.id)}>삭제</button>
+          <button onClick={() => deleteTodo(todo.id)}>삭제</button>
         </>
       )}
     </li>

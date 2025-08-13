@@ -1,14 +1,8 @@
-import { todoType } from '@/types/todoType';
+import { useTodosState } from '../../context/todo/hooks';
 import TodoItem from './TodoItem';
 
-type TodoListProps = {
-  todos: todoType[];
-  onToggle: (id: string) => void;
-  onDelete: (id: string) => void;
-  onEdit: (id: string, newTitle: string) => void;
-};
-
-const TodoList = ({ todos, onToggle, onDelete, onEdit }: TodoListProps): JSX.Element => {
+const TodoList = (): JSX.Element => {
+  const { todos } = useTodosState();
   return (
     <div>
       <h2>할일목록</h2>
@@ -17,19 +11,10 @@ const TodoList = ({ todos, onToggle, onDelete, onEdit }: TodoListProps): JSX.Ele
       ) : (
         <ul>
           {todos.map(item => (
-            <TodoItem
-              key={item.id}
-              todo={item}
-              onToggle={onToggle}
-              onDelete={onDelete}
-              onEdit={onEdit}
-            />
+            <TodoItem key={item.id} todo={item} />
           ))}
         </ul>
       )}
-      {/* 할일 즉 todos는 여러개의 item으로 구성된 배열이다. map으로 출력 */}
-
-      {/* <TodoItem onToggle={onToggle} onDelete={onDelete} onEdit={onEdit} /> */}
     </div>
   );
 };
