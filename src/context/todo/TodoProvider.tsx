@@ -1,5 +1,5 @@
 import { createContext, useCallback, useMemo, useReducer } from 'react';
-import { todosReducer } from './retucer';
+import { todosReducer } from './reducer';
 import { initialState, todoAction, todoState } from './types';
 import { todoType } from '@/types/todoType';
 import * as AC from './actions';

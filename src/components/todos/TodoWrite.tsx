@@ -1,8 +1,10 @@
-import { ChangeEvent, KeyboardEvent, KeyboardEventHandler, useState } from 'react';
-import { todoType } from '../../types/todoType';
+import { ChangeEvent, KeyboardEvent, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTodosActions } from '../../context/todo/hooks';
+import { todoType } from '../../types/todoType';
 
 const TodoWrite = () => {
+  const navigate = useNavigate();
   // js 자리
   const { addTodo } = useTodosActions();
   // 할일 제목 값 관리
@@ -15,6 +17,8 @@ const TodoWrite = () => {
     // enter 키를 입력시 처리
     if (e.key === 'Enter') {
       handleAdd();
+      setTitle('');
+      navigate('/todos/read');
     }
   };
   // 새 할일 등록하기
